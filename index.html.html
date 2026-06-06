@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>I.E. Privada — Sistema Educativo</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:        #0F2A4A;
+  --navy-dark:   #081929;
+  --navy-mid:    #1A4070;
+  --gold:        #C9A84C;
+  --gold-light:  #E4C97A;
+  --gold-pale:   #F5E9C6;
+  --teal:        #0E6E6B;
+  --teal-light:  #E6F5F4;
+  --ivory:       #FAF8F4;
+  --ivory-dark:  #EEE9DE;
+  --dark:        #111820;
+  --text:        #1C2B3A;
+  --text-muted:  #5A6A7A;
+  --white:       #FFFFFF;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:'Outfit',sans-serif;background:var(--ivory);color:var(--text);overflow-x:hidden;}
+
+/* LOGIN */
+#login-overlay{position:fixed;inset:0;z-index:9999;background:var(--navy-dark);background-image:radial-gradient(ellipse at 20% 50%,rgba(201,168,76,0.08),transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(14,110,107,0.15),transparent 50%);display:flex;align-items:center;justify-content:center;}
+.login-box{background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.25);border-radius:16px;padding:3rem 3.5rem;width:380px;max-width:90vw;text-align:center;backdrop-filter:blur(12px);}
+.login-seal{width:90px;height:90px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:var(--gold);letter-spacing:1px;}
+.login-title{font-family:'Cormorant Garamond',serif;color:var(--gold-light);font-size:20px;font-weight:600;margin-bottom:4px;}
+.login-sub{color:rgba(255,255,255,0.4);font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-bottom:2rem;}
+.login-input{width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:12px 16px;color:white;font-family:'Outfit',sans-serif;font-size:14px;margin-bottom:12px;outline:none;transition:border-color .2s;}
+.login-input::placeholder{color:rgba(255,255,255,0.3);}
+.login-input:focus{border-color:var(--gold);}
+.login-btn{width:100%;background:linear-gradient(135deg,var(--gold),var(--gold-light));border:none;border-radius:8px;padding:13px;color:var(--navy-dark);font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;cursor:pointer;letter-spacing:1px;text-transform:uppercase;margin-top:4px;transition:opacity .2s;}
+.login-btn:hover{opacity:.9;}
+.login-error{color:#FF8A8A;font-size:12px;margin-top:8px;display:none;}
+
+/* SITE */
+#site{display:none;min-height:100vh;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(250,248,244,0.97);backdrop-filter:blur(16px);border-bottom:1px solid rgba(15,42,74,0.12);padding:0 3rem;height:68px;display:flex;align-items:center;justify-content:space-between;}
+.nav-brand{display:flex;align-items:center;gap:12px;cursor:pointer;}
+.nav-seal-sm{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--navy);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:700;color:var(--navy);}
+.nav-name{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:var(--navy-dark);line-height:1.2;}
+.nav-name span{display:block;font-size:11px;font-weight:400;color:var(--text-muted);letter-spacing:1.5px;text-transform:uppercase;font-family:'Outfit',sans-serif;}
+.nav-links{display:flex;align-items:center;gap:2rem;}
+.nav-link{background:none;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13.5px;font-weight:500;color:var(--text-muted);position:relative;padding-bottom:2px;transition:color .2s;}
+.nav-link::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:1.5px;background:var(--navy);transform:scaleX(0);transition:transform .2s;}
+.nav-link:hover,.nav-link.active{color:var(--navy);}
+.nav-link.active::after,.nav-link:hover::after{transform:scaleX(1);}
+.nav-cta{background:var(--navy)!important;color:white!important;padding:8px 20px!important;border-radius:6px!important;}
+.nav-cta::after{display:none!important;}
+.nav-cta:hover{background:var(--navy-dark)!important;}
+
+/* PAGE */
+.page{display:none;padding-top:68px;min-height:100vh;animation:fadeIn .35s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+/* SHARED */
+.container{max-width:1160px;margin:0 auto;padding:0 2rem;}
+.section-label{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--navy);font-weight:500;margin-bottom:10px;}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(30px,4vw,46px);font-weight:600;color:var(--navy-dark);line-height:1.15;margin-bottom:1rem;}
+.section-sub{font-size:15px;color:var(--text-muted);font-weight:300;line-height:1.7;max-width:580px;}
+.gold-divider{width:60px;height:2px;background:linear-gradient(90deg,var(--gold),var(--gold-light));margin:1rem 0 1.5rem;}
+.btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--navy-dark);border:none;border-radius:8px;padding:14px 32px;font-size:14px;font-weight:600;cursor:pointer;letter-spacing:.5px;transition:transform .2s,box-shadow .2s;display:inline-block;}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(201,168,76,.35);}
+.btn-outline{background:transparent;color:var(--white);border:1.5px solid rgba(255,255,255,.4);border-radius:8px;padding:13px 32px;font-size:14px;font-weight:500;cursor:pointer;letter-spacing:.5px;transition:all .2s;display:inline-block;}
+.btn-outline:hover{background:rgba(255,255,255,.1);}
+
+/* ═══ INICIO ═══ */
+#page-inicio{background:var(--navy-dark);}
+.hero{min-height:calc(100vh - 68px);background-image:radial-gradient(ellipse at 0% 100%,rgba(14,110,107,.35),transparent 55%),radial-gradient(ellipse at 100% 0%,rgba(201,168,76,.1),transparent 50%);display:flex;align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden;padding:4rem 2rem;}
+.hero-bg{position:absolute;font-family:'Cormorant Garamond',serif;font-size:clamp(80px,16vw,200px);font-weight:700;color:rgba(201,168,76,.03);pointer-events:none;user-select:none;top:50%;transform:translateY(-50%);white-space:nowrap;}
+.hero-content{position:relative;z-index:1;max-width:860px;}
+.hero-badge{display:inline-block;border:1px solid rgba(201,168,76,.4);color:var(--gold-light);font-size:11px;letter-spacing:3px;text-transform:uppercase;padding:6px 20px;border-radius:20px;margin-bottom:2rem;background:rgba(201,168,76,.06);animation:fadeUp .6s ease both .1s;}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(42px,7vw,82px);font-weight:600;color:white;line-height:1.05;margin-bottom:1rem;animation:fadeUp .6s ease both .25s;}
+.hero-title em{color:var(--gold-light);font-style:italic;}
+.hero-lema{font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:rgba(255,255,255,.45);margin-bottom:1.5rem;animation:fadeUp .6s ease both .35s;}
+.hero-desc{font-size:16px;font-weight:300;color:rgba(255,255,255,.65);line-height:1.8;max-width:620px;margin:0 auto 2.5rem;animation:fadeUp .6s ease both .45s;}
+.hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;animation:fadeUp .6s ease both .55s;}
+.hero-stats{display:flex;gap:3rem;justify-content:center;flex-wrap:wrap;margin-top:4rem;padding-top:2.5rem;border-top:1px solid rgba(255,255,255,.1);animation:fadeUp .6s ease both .7s;}
+.hero-stat-n{font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:600;color:var(--gold-light);line-height:1;}
+.hero-stat-l{font-size:12px;color:rgba(255,255,255,.4);margin-top:4px;}
+
+/* pillars */
+.pillars-strip{background:white;border-top:3px solid var(--gold);padding:4rem 0;}
+.pillars-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;}
+.pillar-card{background:var(--ivory);border-radius:14px;padding:2rem;border-left:4px solid var(--gold);}
+.pillar-icon{font-size:28px;margin-bottom:1rem;}
+.pillar-title{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--navy-dark);margin-bottom:.5rem;}
+.pillar-text{font-size:13.5px;color:var(--text-muted);line-height:1.7;font-weight:300;}
+
+/* news */
+.news-strip{background:var(--ivory);padding:4rem 0;}
+.news-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:2rem;}
+.news-card{background:white;border-radius:12px;overflow:hidden;border:1px solid var(--ivory-dark);transition:box-shadow .2s,transform .2s;cursor:pointer;}
+.news-card:hover{box-shadow:0 8px 32px rgba(17,24,32,.1);transform:translateY(-3px);}
+.news-card-top{background:var(--navy-dark);height:6px;}
+.news-card-body{padding:1.5rem;}
+.news-date{font-size:11px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+.news-title{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--navy-dark);margin-bottom:8px;line-height:1.3;}
+.news-text{font-size:13px;color:var(--text-muted);line-height:1.6;font-weight:300;}
+
+/* ═══ SISTEMA ═══ */
+#page-sistema{background:var(--ivory);}
+.sis-hero{background:var(--navy-dark);padding:5rem 0 4rem;}
+.sis-hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,5vw,60px);color:white;font-weight:600;margin-bottom:1rem;}
+.sis-hero p{color:rgba(255,255,255,.6);font-size:16px;font-weight:300;max-width:560px;}
+.sis-body{padding:4rem 0;}
+.sis-tabs{display:flex;gap:0;margin-bottom:3rem;border-bottom:2px solid var(--ivory-dark);}
+.sis-tab{padding:12px 28px;font-size:14px;font-weight:500;color:var(--text-muted);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;font-family:'Outfit',sans-serif;}
+.sis-tab.active{color:var(--navy);border-bottom-color:var(--navy);}
+.sis-panel{display:none;}
+.sis-panel.active{display:block;animation:fadeIn .3s ease;}
+
+/* nivel cards */
+.nivel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:2rem;}
+.nivel-card{background:white;border-radius:14px;border:1px solid var(--ivory-dark);overflow:hidden;transition:box-shadow .2s,transform .2s;}
+.nivel-card:hover{box-shadow:0 6px 24px rgba(17,24,32,.08);transform:translateY(-2px);}
+.nivel-card-header{padding:1.25rem 1.4rem .8rem;border-bottom:1px solid var(--ivory-dark);}
+.nivel-card-bar{width:100%;height:4px;border-radius:2px;margin-bottom:1rem;}
+.nivel-card-name{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--navy-dark);font-weight:600;}
+.nivel-card-years{font-size:12px;color:var(--text-muted);margin-top:3px;}
+.nivel-card-body{padding:1rem 1.4rem 1.25rem;}
+.nivel-card-text{font-size:13px;color:var(--text-muted);line-height:1.7;font-weight:300;}
+
+/* ruta cards */
+.ruta-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:1.5rem;}
+.ruta-card{border-radius:14px;padding:2rem;border:1px solid;}
+.ruta-card.bi{background:rgba(15,42,74,.04);border-color:rgba(15,42,74,.2);}
+.ruta-card.oficio{background:rgba(201,168,76,.06);border-color:rgba(201,168,76,.35);}
+.ruta-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;margin-bottom:.5rem;}
+.ruta-card.bi .ruta-title{color:var(--navy-dark);}
+.ruta-card.oficio .ruta-title{color:#7A5200;}
+.ruta-pct{font-size:13px;color:var(--text-muted);margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--ivory-dark);}
+.ruta-item{font-size:13px;color:var(--text-muted);line-height:1.8;font-weight:300;}
+.ruta-item strong{color:var(--text);font-weight:500;}
+
+/* cursos table */
+.cursos-table{width:100%;border-collapse:collapse;margin-top:1rem;}
+.cursos-table th{text-align:left;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);font-weight:500;padding:10px 12px;border-bottom:2px solid var(--ivory-dark);}
+.cursos-table td{padding:12px;font-size:13.5px;color:var(--text);border-bottom:1px solid var(--ivory-dark);vertical-align:top;}
+.cursos-table tr:hover td{background:var(--ivory);}
+.credito-badge{display:inline-block;background:var(--navy);color:white;font-size:11px;font-weight:600;padding:2px 10px;border-radius:20px;}
+.cursos-sub{font-size:12px;color:var(--text-muted);font-weight:300;margin-top:3px;}
+.total-row td{font-weight:600;color:var(--navy-dark);border-top:2px solid var(--navy);border-bottom:none;}
+
+/* meritocracia */
+.merito-steps{display:flex;flex-direction:column;gap:0;margin-top:1rem;}
+.merito-step{display:flex;gap:1.5rem;padding-bottom:2rem;position:relative;}
+.merito-step:not(:last-child)::before{content:'';position:absolute;left:19px;top:42px;width:1px;bottom:0;background:var(--ivory-dark);}
+.merito-num{width:40px;height:40px;border-radius:50%;flex-shrink:0;background:var(--navy);color:white;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;}
+.merito-title{font-size:15px;font-weight:600;color:var(--navy-dark);margin-bottom:4px;}
+.merito-text{font-size:13px;color:var(--text-muted);line-height:1.6;font-weight:300;}
+.formula-box{background:var(--ivory);border:1px solid var(--ivory-dark);border-radius:8px;padding:.85rem 1.1rem;font-family:'Courier New',monospace;font-size:12px;color:var(--text);margin-top:.75rem;line-height:1.7;}
+
+/* penalizaciones */
+.pen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:1rem;}
+.pen-card{background:white;border-radius:12px;padding:1.4rem;border-top:3px solid;}
+.pen-card.amber{border-top-color:#C9A84C;}
+.pen-card.red{border-top-color:#B91C1C;}
+.pen-card.blue{border-top-color:var(--navy);}
+.pen-card-title{font-size:14px;font-weight:600;color:var(--navy-dark);margin-bottom:.5rem;}
+.pen-card-text{font-size:13px;color:var(--text-muted);line-height:1.65;font-weight:300;}
+
+/* sanciones table */
+.sanc-table{width:100%;border-collapse:collapse;margin-top:1rem;}
+.sanc-table th{text-align:left;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);font-weight:500;padding:10px 12px;border-bottom:2px solid var(--ivory-dark);}
+.sanc-table td{padding:10px 12px;font-size:13px;border-bottom:1px solid var(--ivory-dark);vertical-align:top;}
+.sanc-table tr.baja td{background:#FEF2F2;color:#B91C1C;font-weight:500;}
+.sanc-table tr:not(.baja):hover td{background:var(--ivory);}
+
+/* oficios */
+.oficio-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:1rem;}
+.oficio-card{background:white;border-radius:12px;border:1px solid var(--ivory-dark);border-left:4px solid var(--gold);padding:1.25rem 1.4rem;transition:box-shadow .2s,transform .2s;}
+.oficio-card:hover{box-shadow:0 6px 24px rgba(17,24,32,.08);transform:translateY(-2px);}
+.oficio-name{font-size:15px;font-weight:600;color:var(--navy-dark);margin-bottom:4px;}
+.oficio-text{font-size:12px;color:var(--text-muted);line-height:1.6;font-weight:300;}
+
+/* ═══ ADMISIÓN ═══ */
+#page-admision{background:white;}
+.admision-hero{background:var(--navy-dark);padding:5rem 0 4rem;}
+.admision-hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,5vw,60px);color:white;font-weight:600;margin-bottom:1rem;}
+.admision-hero p{color:rgba(255,255,255,.6);font-size:16px;font-weight:300;max-width:560px;}
+.admision-body{padding:4rem 0;}
+.admision-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start;margin-bottom:4rem;}
+.steps{display:flex;flex-direction:column;gap:0;}
+.step{display:flex;gap:1.5rem;padding-bottom:2rem;position:relative;}
+.step:not(:last-child)::before{content:'';position:absolute;left:19px;top:42px;width:1px;bottom:0;background:var(--ivory-dark);}
+.step-num{width:40px;height:40px;border-radius:50%;flex-shrink:0;background:var(--navy);color:white;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;}
+.step-title{font-size:15px;font-weight:600;color:var(--navy-dark);margin-bottom:4px;}
+.step-text{font-size:13px;color:var(--text-muted);line-height:1.6;font-weight:300;}
+.admision-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.admision-card{background:var(--ivory);border-radius:12px;padding:1.4rem;border:1px solid var(--ivory-dark);}
+.admision-card-icon{font-size:26px;margin-bottom:8px;}
+.admision-card-title{font-size:14px;font-weight:600;color:var(--navy-dark);margin-bottom:5px;}
+.admision-card-text{font-size:13px;color:var(--text-muted);line-height:1.6;font-weight:300;}
+.req-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.req-card{background:var(--ivory);border-radius:12px;padding:1.5rem;border-top:3px solid var(--navy);text-align:center;}
+.req-card h4{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--navy-dark);margin-bottom:.75rem;}
+.req-card ul{list-style:none;}
+.req-card li{font-size:13px;color:var(--text-muted);padding:5px 0;border-bottom:1px solid var(--ivory-dark);font-weight:300;}
+.req-card li:last-child{border-bottom:none;}
+
+/* ═══ TRAYECTORIAS ═══ */
+#page-trayectoria{background:var(--navy-dark);}
+.tray-hero{padding:5rem 0 4rem;background-image:radial-gradient(ellipse at 80% 100%,rgba(14,110,107,.35),transparent 60%);}
+.tray-hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,5vw,60px);color:white;font-weight:600;margin-bottom:1rem;}
+.tray-hero p{color:rgba(255,255,255,.6);font-size:16px;font-weight:300;max-width:560px;}
+.tray-body{padding:4rem 0;}
+.tray-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:2.5rem;}
+.tray-card{background:rgba(255,255,255,.05);border:1px solid rgba(201,168,76,.2);border-radius:14px;padding:2rem;transition:border-color .2s;}
+.tray-card:hover{border-color:rgba(201,168,76,.5);}
+.tray-icon{font-size:32px;margin-bottom:1rem;}
+.tray-title{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold-light);margin-bottom:.75rem;}
+.tray-text{font-size:13.5px;color:rgba(255,255,255,.6);line-height:1.7;font-weight:300;}
+.ventaja-bar{background:rgba(255,255,255,.05);border:1px solid rgba(201,168,76,.15);border-radius:14px;padding:2.5rem;}
+.ventaja-title{font-family:'Cormorant Garamond',serif;font-size:26px;color:white;margin-bottom:1.5rem;}
+.ventaja-items{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;}
+.ventaja-item{text-align:center;}
+.ventaja-n{font-family:'Cormorant Garamond',serif;font-size:36px;color:var(--gold-light);font-weight:600;}
+.ventaja-l{font-size:12px;color:rgba(255,255,255,.45);margin-top:4px;}
+
+/* FOOTER */
+footer{background:var(--dark);padding:3.5rem 0 2rem;}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:3rem;margin-bottom:2.5rem;}
+.footer-brand{font-family:'Cormorant Garamond',serif;font-size:22px;color:white;margin-bottom:6px;}
+.footer-lema{font-size:12px;color:rgba(255,255,255,.35);font-style:italic;margin-bottom:1rem;}
+.footer-about{font-size:13px;color:rgba(255,255,255,.4);line-height:1.7;font-weight:300;}
+.footer-col h4{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;}
+.footer-col ul{list-style:none;}
+.footer-col li{margin-bottom:8px;}
+.footer-col a{font-size:13px;color:rgba(255,255,255,.45);text-decoration:none;cursor:pointer;transition:color .2s;}
+.footer-col a:hover{color:var(--gold-light);}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.08);padding-top:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;}
+.footer-bottom p{font-size:12px;color:rgba(255,255,255,.25);}
+.footer-badge{font-size:11px;color:rgba(201,168,76,.6);border:1px solid rgba(201,168,76,.2);padding:4px 12px;border-radius:20px;letter-spacing:1px;}
+
+@media(max-width:768px){
+  nav{padding:0 1.25rem;}
+  .nav-links{gap:.75rem;}
+  .nav-link{font-size:12px;}
+  .pillars-grid,.news-grid,.tray-grid,.admision-grid,.nivel-grid,.ruta-grid,.pen-grid,.req-grid,.ventaja-items{grid-template-columns:1fr;}
+  .footer-grid{grid-template-columns:1fr;}
+  .admision-cards{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-overlay">
+  <div class="login-box">
+    <div class="login-seal">I.E.</div>
+    <div class="login-title">Sistema Educativo Privado</div>
+    <div class="login-sub">Portal Institucional · Acceso Restringido</div>
+    <input class="login-input" type="text" id="lu" placeholder="Usuario" autocomplete="off">
+    <input class="login-input" type="password" id="lp" placeholder="Contraseña">
+    <button class="login-btn" onclick="doLogin()">Ingresar</button>
+    <div class="login-error" id="lerr">Credenciales incorrectas.</div>
+  </div>
+</div>
+
+<!-- SITE -->
+<div id="site">
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand" onclick="goTo('inicio')">
+    <div class="nav-seal-sm">I.E.</div>
+    <div class="nav-name">I.E. Privada <span>Lima, Perú · Proyecto en desarrollo</span></div>
+  </div>
+  <div class="nav-links">
+    <button class="nav-link" data-page="inicio" onclick="goTo('inicio')">Inicio</button>
+    <button class="nav-link" data-page="sistema" onclick="goTo('sistema')">Sistema</button>
+    <button class="nav-link" data-page="admision" onclick="goTo('admision')">Admisión</button>
+    <button class="nav-link" data-page="trayectoria" onclick="goTo('trayectoria')">Trayectorias</button>
+    <button class="nav-link nav-cta" onclick="goTo('admision')">Postular</button>
+  </div>
+</nav>
+
+<!-- ═══ INICIO ═══ -->
+<div class="page" id="page-inicio">
+  <div class="hero">
+    <div class="hero-bg">EXCELENCIA</div>
+    <div class="hero-content">
+      <div class="hero-badge">Lima, Perú · Educación de alto nivel · Sistema propio</div>
+      <h1 class="hero-title">Institución<br>Educativa <em>Privada</em></h1>
+      <p class="hero-lema">Mérito · Disciplina · Futuro</p>
+      <p class="hero-desc">Un sistema educativo diseñado para acortar la trayectoria de vida de los jóvenes peruanos. Dos rutas claras: Bachillerato Internacional o Certificado de Oficio técnico. Inglés C1 certificado para todos los egresados.</p>
+      <div class="hero-btns">
+        <button class="btn-primary" onclick="goTo('admision')">Conocer el proceso</button>
+        <button class="btn-outline" onclick="goTo('sistema')">Ver el sistema</button>
+      </div>
+      <div class="hero-stats">
+        <div><div class="hero-stat-n">3</div><div class="hero-stat-l">Niveles educativos</div></div>
+        <div><div class="hero-stat-n">192</div><div class="hero-stat-l">Alumnos por promoción</div></div>
+        <div><div class="hero-stat-n">C1</div><div class="hero-stat-l">IELTS al egresar</div></div>
+        <div><div class="hero-stat-n">2 años</div><div class="hero-stat-l">De ventaja laboral</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pillars-strip">
+    <div class="container">
+      <div class="section-label">Nuestra esencia</div>
+      <h2 class="section-title">Tres pilares institucionales</h2>
+      <div class="gold-divider"></div>
+      <div class="pillars-grid">
+        <div class="pillar-card">
+          <div class="pillar-icon">🏆</div>
+          <div class="pillar-title">Meritocracia real</div>
+          <div class="pillar-text">El esfuerzo sostenido define el destino académico. Un sistema de puntaje acumulado con hasta 5 decimales de precisión determina sin favoritismos quién accede al Bachillerato Internacional. Cada décima cuenta.</div>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-icon">🚀</div>
+          <div class="pillar-title">Aceleración de vida</div>
+          <div class="pillar-text">Independientemente de la ruta, todos los egresados llegan al mercado laboral con 1.5 a 2 años de ventaja. A los 18 con título técnico o a los 19 con grado universitario. Con inglés C1 certificado IELTS.</div>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-icon">🎯</div>
+          <div class="pillar-title">Dos rutas, misma exigencia</div>
+          <div class="pillar-text">El BI abre las puertas de las universidades del mundo y convalida 2 ciclos universitarios. El oficio técnico convalida cursos en institutos y reduce la carrera de 3 a 2 años. No hay rutas de segunda categoría.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="news-strip">
+    <div class="container">
+      <div class="section-label">Acerca del proyecto</div>
+      <h2 class="section-title">Por qué este sistema</h2>
+      <div class="gold-divider"></div>
+      <div class="news-grid">
+        <div class="news-card">
+          <div class="news-card-top"></div>
+          <div class="news-card-body">
+            <div class="news-date">Contexto peruano</div>
+            <div class="news-title">Un sistema diseñado para la realidad del Perú</div>
+            <div class="news-text">La mayoría de familias peruanas no llegan a educación superior. Este sistema permite que hijos de familias trabajadoras tengan un título técnico a los 18 o un grado universitario a los 19, con inglés certificado.</div>
+          </div>
+        </div>
+        <div class="news-card">
+          <div class="news-card-top"></div>
+          <div class="news-card-body">
+            <div class="news-date">Bifurcación inteligente</div>
+            <div class="news-title">El 40% al BI, el 60% a oficios técnicos de alta demanda</div>
+            <div class="news-text">La proporción refleja la demanda real del mercado laboral peruano. No se produce exceso de profesionales sin campo laboral. Cada egresado tiene un destino concreto y bien remunerado.</div>
+          </div>
+        </div>
+        <div class="news-card">
+          <div class="news-card-top"></div>
+          <div class="news-card-body">
+            <div class="news-date">Diferencial competitivo</div>
+            <div class="news-title">IELTS C1 para todos, diploma IB para los mejores</div>
+            <div class="news-text">El inglés C1 certificado es un diferencial que la mayoría de técnicos y profesionales peruanos nunca alcanzan. El diploma IB es reconocido por universidades en todo el mundo para convalidación de créditos.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">I.E. Privada</div>
+          <p class="footer-lema">Mérito · Disciplina · Futuro</p>
+          <p class="footer-about">Sistema educativo privado diseñado para la realidad peruana. Dos rutas de egreso: Bachillerato Internacional y Certificado de Oficio técnico. IELTS C1 para todos los egresados.</p>
+        </div>
+        <div class="footer-col"><h4>Sistema</h4><ul>
+          <li><a onclick="goTo('sistema')">Estructura</a></li>
+          <li><a onclick="goTo('sistema')">Malla curricular</a></li>
+          <li><a onclick="goTo('sistema')">Meritocracia</a></li>
+          <li><a onclick="goTo('sistema')">Oficios técnicos</a></li>
+        </ul></div>
+        <div class="footer-col"><h4>Institución</h4><ul>
+          <li><a onclick="goTo('inicio')">Inicio</a></li>
+          <li><a onclick="goTo('admision')">Admisión</a></li>
+          <li><a onclick="goTo('trayectoria')">Trayectorias</a></li>
+        </ul></div>
+      </div>
+      <div class="footer-bottom">
+        <p>© I.E. Privada · Lima, Perú · Proyecto en desarrollo</p>
+        <div class="footer-badge">Portal Privado · Acceso Autorizado</div>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ═══ SISTEMA ═══ -->
+<div class="page" id="page-sistema">
+  <div class="sis-hero">
+    <div class="container">
+      <div class="section-label" style="color:var(--gold)">Arquitectura académica</div>
+      <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(36px,5vw,60px);color:white;font-weight:600;display:block;margin-bottom:1rem;">El Sistema</h1>
+      <p style="color:rgba(255,255,255,.6);font-size:16px;font-weight:300;max-width:560px;">Estructura completa, malla curricular, sistema de meritocracia, penalizaciones, sanciones y oficios técnicos disponibles.</p>
+    </div>
+  </div>
+  <div class="sis-body">
+    <div class="container">
+      <div class="sis-tabs">
+        <button class="sis-tab active" onclick="showSis('estructura',this)">Estructura</button>
+        <button class="sis-tab" onclick="showSis('malla',this)">Malla curricular</button>
+        <button class="sis-tab" onclick="showSis('merito',this)">Meritocracia</button>
+        <button class="sis-tab" onclick="showSis('sanciones',this)">Sanciones</button>
+        <button class="sis-tab" onclick="showSis('oficios',this)">Oficios técnicos</button>
+      </div>
+
+      <!-- ESTRUCTURA -->
+      <div class="sis-panel active" id="sp-estructura">
+        <div class="section-label">Niveles</div>
+        <h2 class="section-title" style="margin-bottom:1.5rem;">Tres niveles educativos</h2>
+        <div class="nivel-grid">
+          <div class="nivel-card">
+            <div class="nivel-card-header">
+              <div class="nivel-card-bar" style="background:linear-gradient(90deg,#4FC3A1,#0E6E6B);"></div>
+              <div class="nivel-card-name">Inicial</div>
+              <div class="nivel-card-years">Años 3, 4 y 5</div>
+            </div>
+            <div class="nivel-card-body">
+              <div class="nivel-card-text">Desarrollo temprano, estimulación cognitiva y formación de hábitos. Base para el ingreso a primaria.</div>
+            </div>
+          </div>
+          <div class="nivel-card">
+            <div class="nivel-card-header">
+              <div class="nivel-card-bar" style="background:linear-gradient(90deg,#3B82F6,#1A4070);"></div>
+              <div class="nivel-card-name">Primaria</div>
+              <div class="nivel-card-years">Años 6, 7, 8, 9 y 10</div>
+            </div>
+            <div class="nivel-card-body">
+              <div class="nivel-card-text">Formación base de 5 años. El desempeño acumulado en primaria determina el ingreso a secundaria mediante meritocracia.</div>
+            </div>
+          </div>
+          <div class="nivel-card">
+            <div class="nivel-card-header">
+              <div class="nivel-card-bar" style="background:linear-gradient(90deg,var(--gold),var(--gold-light));"></div>
+              <div class="nivel-card-name">Secundaria</div>
+              <div class="nivel-card-years">Años 11, 12, 13, 14 y 15</div>
+            </div>
+            <div class="nivel-card-body">
+              <div class="nivel-card-text">8 secciones · 24 alumnos por sección · ~192 alumnos nuevos por año. Los años 11-13 son comunes para todos. Los años 14-15 se bifurcan en BI u oficio según ranking.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-label" style="margin-top:2rem;">Bifurcación — años 14 y 15</div>
+        <h2 class="section-title" style="margin-bottom:1rem;">Bachillerato Internacional u Oficio Técnico</h2>
+        <div class="ruta-grid">
+          <div class="ruta-card bi">
+            <div class="ruta-title">Bachillerato Internacional</div>
+            <div class="ruta-pct">40% del alumnado · 65 vacantes por promoción</div>
+            <div class="ruta-item"><strong>Selección:</strong> Tercio superior del ranking acumulado años 11-13</div>
+            <div class="ruta-item"><strong>Límite por sección:</strong> Mínimo 3 y máximo 10 admitidos</div>
+            <div class="ruta-item"><strong>Egreso:</strong> Diploma IB internacional + IELTS C1</div>
+            <div class="ruta-item"><strong>Universidad:</strong> Convalida 36-48 créditos (2 ciclos universitarios)</div>
+            <div class="ruta-item"><strong>Duración universitaria:</strong> 3 a 3.5 años en lugar de 4</div>
+          </div>
+          <div class="ruta-card oficio">
+            <div class="ruta-title">Certificado de Oficio</div>
+            <div class="ruta-pct">60% del alumnado · ~127 alumnos por promoción</div>
+            <div class="ruta-item"><strong>Selección:</strong> Resto del ranking acumulado años 11-13</div>
+            <div class="ruta-item"><strong>Materias:</strong> Técnicas de nivel instituto, convalidables</div>
+            <div class="ruta-item"><strong>Egreso:</strong> Certificado institucional de oficio + IELTS C1</div>
+            <div class="ruta-item"><strong>Instituto:</strong> Convalida cursos, carrera de 3 años → 2 años</div>
+            <div class="ruta-item"><strong>Título técnico:</strong> A los ~18 años de edad</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MALLA -->
+      <div class="sis-panel" id="sp-malla">
+        <div class="section-label">Cursos</div>
+        <h2 class="section-title" style="margin-bottom:.5rem;">Malla curricular — Secundaria</h2>
+        <p style="font-size:14px;color:var(--text-muted);margin-bottom:1.5rem;font-weight:300;">25 créditos totales · Escala vigesimal /20 · Hasta 5 decimales sin redondear · Mínimo por materia: 13 · Mínimo ponderado: 14</p>
+        <table class="cursos-table">
+          <thead>
+            <tr><th>Curso</th><th>Créditos</th><th>Contenidos</th><th>Mín.</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Matemáticas</strong></td><td><span class="credito-badge">4</span></td><td><span class="cursos-sub">Aritmética · Álgebra · Geometría · Trigonometría</span></td><td>13</td></tr>
+            <tr><td><strong>Ciencias</strong></td><td><span class="credito-badge">4</span></td><td><span class="cursos-sub">Física · Química · Biología</span></td><td>13</td></tr>
+            <tr><td><strong>Humanidades</strong></td><td><span class="credito-badge">4</span></td><td><span class="cursos-sub">Historia · Geografía · Cívica · Psicología · Filosofía · Lógica · Sociología</span></td><td>13</td></tr>
+            <tr><td><strong>Negocios</strong></td><td><span class="credito-badge">3</span></td><td><span class="cursos-sub">Finanzas · Economía · Estadística · Marketing · Liderazgo · Organización</span></td><td>13</td></tr>
+            <tr><td><strong>Comunicación</strong></td><td><span class="credito-badge">3</span></td><td><span class="cursos-sub">Lenguaje · Redacción · Oratoria · Comunicación efectiva · Literatura</span></td><td>13</td></tr>
+            <tr><td><strong>Inglés</strong></td><td><span class="credito-badge">3</span></td><td><span class="cursos-sub">De nivel 0 a C1 · Certificado IELTS al finalizar el año 15</span></td><td>13</td></tr>
+            <tr><td><strong>Deporte</strong></td><td><span class="credito-badge">2</span></td><td><span class="cursos-sub">Elección del alumno: fútbol, vóley, combate u otro deporte olímpico o de habilidades motoras</span></td><td>13</td></tr>
+            <tr><td><strong>Electivos</strong></td><td><span class="credito-badge">2</span></td><td><span class="cursos-sub">MS Office · IA · Programación · Diseño · Edición · Nutrición · Primeros auxilios · Religión · Arte · Astronomía · y otros</span></td><td>13</td></tr>
+            <tr class="total-row"><td><strong>TOTAL</strong></td><td><strong>25</strong></td><td></td><td><strong>Pond. ≥14</strong></td></tr>
+          </tbody>
+        </table>
+        <div class="formula-box" style="margin-top:1.5rem;">
+          Fórmula ponderada:<br>
+          [(Mat×4) + (Cien×4) + (Hum×4) + (Neg×3) + (Com×3) + (Ing×3) + (Dep×2) + (Ele×2)] ÷ 25 = promedio /20
+        </div>
+        <div style="margin-top:1rem;padding:1rem 1.25rem;background:var(--ivory);border-radius:10px;font-size:13px;color:var(--text-muted);">
+          <strong style="color:var(--text);">Recuperación de verano (enero-febrero):</strong><br>
+          0 jalados → solo se verifica el ponderado ≥ 14 · 1 o 2 jalados → recuperación, nota final = (original × 30%) + (recuperación × 70%) · 3+ jalados → repite el año directamente sin recuperación
+        </div>
+      </div>
+
+      <!-- MERITOCRACIA -->
+      <div class="sis-panel" id="sp-merito">
+        <div class="section-label">Sistema de ranking</div>
+        <h2 class="section-title" style="margin-bottom:1.5rem;">Cómo funciona la meritocracia</h2>
+
+        <div class="merito-steps">
+          <div class="merito-step">
+            <div class="merito-num">1</div>
+            <div>
+              <div class="merito-title">Puntaje anual acumulado (años 11-13)</div>
+              <div class="merito-text">Cada año se calcula el promedio ponderado con hasta 5 decimales sin redondear. El acumulado de los 3 primeros años de secundaria es el promedio de los 3 ponderados anuales.</div>
+              <div class="formula-box">Acumulado = (Ponderado año 11 + Ponderado año 12 + Ponderado año 13) ÷ 3</div>
+            </div>
+          </div>
+          <div class="merito-step">
+            <div class="merito-num">2</div>
+            <div>
+              <div class="merito-title">Ranking global al finalizar el año 13</div>
+              <div class="merito-text">Se ordena a los ~192 alumnos de mayor a menor acumulado. El ranking es global (todos los alumnos de todas las secciones juntos), no por sección. Los 65 mejores promedios obtienen vacante al BI. Límite por sección: mínimo 3 y máximo 10 admitidos.</div>
+            </div>
+          </div>
+          <div class="merito-step">
+            <div class="merito-num">3</div>
+            <div>
+              <div class="merito-title">Penalizaciones aplicadas al ponderado</div>
+              <div class="merito-text">Los puntajes que entran al ranking ya tienen aplicadas sus penalizaciones. Las penalizaciones se acumulan y no se perdonan.</div>
+            </div>
+          </div>
+          <div class="merito-step">
+            <div class="merito-num">4</div>
+            <div>
+              <div class="merito-title">Ranking del BI (años 14 y 15)</div>
+              <div class="merito-text">Exclusivo para los 65 alumnos del BI. Puntaje desde 0, solo con los años 14 y 15. Máximo 1000 pts por año = 2000 total. Si hubo repetición previa: −3% del acumulado final. El resultado se convierte a vigesimal sin redondear.</div>
+              <div class="formula-box">Nota BI = (Acumulado 14+15 / 2000) × 20<br>Ejemplo: (1728.971 / 2000) × 20 = 17.28971/20</div>
+            </div>
+          </div>
+          <div class="merito-step">
+            <div class="merito-num">5</div>
+            <div>
+              <div class="merito-title">Ranking general de 5 años (todos los alumnos)</div>
+              <div class="merito-text">Todos acumulan puntaje los 5 años sin excepción. Ranking por sección: 1ro, 2do y 3er puesto, tercio y quinto superior. Para los de oficio y secundaria regular sirve para postular a becas Pronabec y consta en el certificado de estudios. Los de BI tienen su propio ranking paralelo con mayores beneficios.</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:1.5rem;">
+          <div class="section-label">Penalizaciones</div>
+          <h3 style="font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--navy-dark);margin-bottom:1rem;">Tipos de penalización</h3>
+          <div class="pen-grid">
+            <div class="pen-card amber">
+              <div class="pen-card-title">Tipo A — Cursos en recuperación</div>
+              <div class="pen-card-text">−1.5% por cada materia jalada que fue a recuperación de verano. Se aplica al ponderado del año siguiente. 1 jalado → −1.5% · 2 jalados → −3.0%</div>
+            </div>
+            <div class="pen-card red">
+              <div class="pen-card-title">Tipo B — Repetición de año</div>
+              <div class="pen-card-text">Año repetido entra al acumulado con peso 30% + año aprobado con peso 70%. Al año inmediatamente siguiente: −5% al ponderado. El ponderado penalizado determina si avanza.</div>
+            </div>
+            <div class="pen-card blue">
+              <div class="pen-card-title">Tipo C — Entrada al BI con repetición previa</div>
+              <div class="pen-card-text">−3% del puntaje final acumulado del ranking BI. Solo una vez posible ya que la segunda repetición da de baja antes de llegar al BI.</div>
+            </div>
+          </div>
+          <div style="margin-top:1rem;padding:.85rem 1.1rem;background:#FEF9EC;border-radius:8px;font-size:13px;color:#7A5200;border-left:3px solid var(--gold);">
+            <strong>Las penalizaciones se acumulan.</strong> Si un alumno repitió un año (−5%) y tuvo 2 jalados el año anterior (−3%), el siguiente año carga −8% total. El ponderado penalizado determina si avanza, no el bruto.
+          </div>
+        </div>
+      </div>
+
+      <!-- SANCIONES -->
+      <div class="sis-panel" id="sp-sanciones">
+        <div class="section-label">Reglamento</div>
+        <h2 class="section-title" style="margin-bottom:.5rem;">Tabla de sanciones y consecuencias</h2>
+        <p style="font-size:14px;color:var(--text-muted);margin-bottom:1.5rem;font-weight:300;">Sistema progresivo: la primera falla tiene consecuencia académica, la segunda implica baja definitiva de la institución.</p>
+        <table class="sanc-table">
+          <thead><tr><th>Situación</th><th>Consecuencia</th></tr></thead>
+          <tbody>
+            <tr><td>Repite grado años 11–13 — 1ra vez</td><td>Permanece. Puntaje 30/70 en el acumulado. −5% al ponderado del año siguiente.</td></tr>
+            <tr class="baja"><td>Repite cualquier grado — 2da vez</td><td>BAJA DE LA INSTITUCIÓN EDUCATIVA</td></tr>
+            <tr><td>Repite año 14 en BI — 1ra vez total</td><td>Sale del BI. Permanece en año 14 cursando oficio técnico.</td></tr>
+            <tr class="baja"><td>Repite año 14 en BI — ya tenía repetición previa</td><td>BAJA DE LA INSTITUCIÓN EDUCATIVA</td></tr>
+            <tr><td>Repite año 15 en BI — 1ra vez total</td><td>Sale del BI. Solo cursa los cursos regulares de secundaria. Sin BI ni oficio.</td></tr>
+            <tr class="baja"><td>Repite año 15 en BI — ya tenía repetición previa</td><td>BAJA DE LA INSTITUCIÓN EDUCATIVA</td></tr>
+            <tr><td>Repite año 14 en oficio — 1ra vez total</td><td>Permanece en año 14. Puede mantener el mismo oficio o cambiarlo.</td></tr>
+            <tr class="baja"><td>Repite año 14 en oficio — ya tenía repetición previa</td><td>BAJA DE LA INSTITUCIÓN EDUCATIVA</td></tr>
+            <tr><td>Repite año 15 en oficio — 1ra vez total</td><td>Permanece en año 15. Pasa a secundaria regular. Sin certificado de oficio.</td></tr>
+            <tr class="baja"><td>Repite año 15 en oficio — ya tenía repetición previa</td><td>BAJA DE LA INSTITUCIÓN EDUCATIVA</td></tr>
+          </tbody>
+        </table>
+        <div style="margin-top:1rem;padding:.85rem 1.1rem;background:#FEF2F2;border-radius:8px;font-size:13px;color:#B91C1C;border-left:3px solid #B91C1C;">
+          <strong>Regla absoluta:</strong> Solo se puede repetir un grado una vez en toda la trayectoria. La segunda repetición implica baja inmediata sin excepción ni apelación.
+        </div>
+      </div>
+
+      <!-- OFICIOS -->
+      <div class="sis-panel" id="sp-oficios">
+        <div class="section-label">Ruta técnica</div>
+        <h2 class="section-title" style="margin-bottom:.5rem;">Oficios técnicos disponibles</h2>
+        <p style="font-size:14px;color:var(--text-muted);margin-bottom:1.5rem;font-weight:300;">Los alumnos cursan materias técnicas de nivel instituto durante los años 14 y 15. El certificado institucional convalida cursos y reduce la carrera técnica de 3 a 2 años en institutos asociados.</p>
+        <div class="oficio-grid">
+          <div class="oficio-card">
+            <div class="oficio-name">📸 Fotografía</div>
+            <div class="oficio-text">Composición · Iluminación · Edición · Fotografía comercial y publicitaria. Instituto: 2 años (convalidado de 3).</div>
+          </div>
+          <div class="oficio-card">
+            <div class="oficio-name">🎨 Diseño y animación</div>
+            <div class="oficio-text">Diseño gráfico · Motion graphics · Herramientas digitales · Portafolio. Instituto: 2 años (convalidado de 3).</div>
+          </div>
+          <div class="oficio-card">
+            <div class="oficio-name">📣 Marketing</div>
+            <div class="oficio-text">Marketing digital · Redes sociales · Publicidad · Analítica básica. Instituto: 2 años (convalidado de 3).</div>
+          </div>
+          <div class="oficio-card">
+            <div class="oficio-name">📊 Gestión</div>
+            <div class="oficio-text">Administración · Planificación · Gestión de equipos · Procesos. Instituto: 2 años (convalidado de 3).</div>
+          </div>
+          <div class="oficio-card">
+            <div class="oficio-name">🧾 Contabilidad</div>
+            <div class="oficio-text">Costos · Tributos · Estados financieros · Software contable. Instituto: 2 años (convalidado de 3).</div>
+          </div>
+          <div class="oficio-card">
+            <div class="oficio-name">🏥 Enfermería técnica</div>
+            <div class="oficio-text">Cuidado del paciente · Procedimientos básicos · Bioseguridad · Primeros auxilios avanzados. Instituto: 2 años.</div>
+          </div>
+          <div class="oficio-card">
+            <div class="oficio-name">🔬 Laboratorio clínico</div>
+            <div class="oficio-text">Análisis clínicos · Instrumentación · Procedimientos · Control de calidad. Instituto: 2 años (convalidado de 3).</div>
+          </div>
+          <div class="oficio-card">
+            <div class="oficio-name">🛡️ Seguridad ocupacional</div>
+            <div class="oficio-text">Seguridad ocupacional · Protocolos · Gestión de riesgos · Normativa legal. Instituto: 2 años (convalidado de 3).</div>
+          </div>
+          <div class="oficio-card" style="border-left-color:var(--text-muted);opacity:.7;">
+            <div class="oficio-name">+ Más según demanda</div>
+            <div class="oficio-text">La oferta de oficios se actualiza periódicamente según la demanda laboral vigente en el mercado peruano.</div>
+          </div>
+        </div>
+        <div style="margin-top:1.25rem;padding:.85rem 1.1rem;background:#FFFBEB;border-radius:8px;font-size:13px;color:#7A5200;border-left:3px solid var(--gold);">
+          <strong>Importante:</strong> El certificado institucional no reemplaza el título técnico profesional. Para ejercer, el alumno debe cursar la carrera en un instituto técnico. El beneficio es la convalidación de cursos que reduce la duración de 3 a 2 años.
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div><div class="footer-brand">I.E. Privada</div><p class="footer-lema">Mérito · Disciplina · Futuro</p><p class="footer-about">Sistema educativo privado con Bachillerato Internacional integrado. Lima, Perú.</p></div>
+        <div class="footer-col"><h4>Sistema</h4><ul><li><a onclick="goTo('sistema')">Estructura</a></li><li><a onclick="goTo('sistema')">Malla</a></li><li><a onclick="goTo('sistema')">Meritocracia</a></li><li><a onclick="goTo('sistema')">Oficios</a></li></ul></div>
+        <div class="footer-col"><h4>Institución</h4><ul><li><a onclick="goTo('inicio')">Inicio</a></li><li><a onclick="goTo('admision')">Admisión</a></li><li><a onclick="goTo('trayectoria')">Trayectorias</a></li></ul></div>
+      </div>
+      <div class="footer-bottom"><p>© I.E. Privada · Lima, Perú</p><div class="footer-badge">Portal Privado</div></div>
+    </div>
+  </footer>
+</div>
+
+<!-- ═══ ADMISIÓN ═══ -->
+<div class="page" id="page-admision">
+  <div class="admision-hero">
+    <div class="container">
+      <div class="section-label" style="color:var(--gold)">Proceso de postulación</div>
+      <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(36px,5vw,60px);color:white;font-weight:600;margin-bottom:1rem;">Admisión</h1>
+      <p style="color:rgba(255,255,255,.6);font-size:16px;font-weight:300;max-width:560px;">Selección basada en meritocracia. El desempeño académico acumulado es el único criterio que determina el acceso al Bachillerato Internacional.</p>
+    </div>
+  </div>
+  <div class="admision-body">
+    <div class="container">
+      <div class="admision-grid">
+        <div>
+          <div class="section-label">Pasos</div>
+          <h2 class="section-title">Proceso de admisión</h2>
+          <div class="gold-divider"></div>
+          <div class="steps">
+            <div class="step"><div class="step-num">1</div><div><div class="step-title">Postulación en línea</div><div class="step-text">Completa el formulario de postulación para el nivel deseado: inicial, primaria o secundaria. La admisión a secundaria es exclusiva para egresados de primaria de la institución o mediante evaluación de equivalencia.</div></div></div>
+            <div class="step"><div class="step-num">2</div><div><div class="step-title">Evaluación de ingreso</div><div class="step-text">Prueba de aptitud académica según el nivel. Para ingreso a secundaria externa, se evalúa el rendimiento equivalente a los 5 años de primaria del sistema.</div></div></div>
+            <div class="step"><div class="step-num">3</div><div><div class="step-title">Asignación de sección</div><div class="step-text">Los ingresantes son distribuidos en las 8 secciones de 24 alumnos cada una. Desde el primer día el puntaje empieza a acumularse.</div></div></div>
+            <div class="step"><div class="step-num">4</div><div><div class="step-title">Bifurcación al finalizar año 13</div><div class="step-text">Al terminar el tercer año de secundaria, el ranking global determina quiénes cursan el BI (65 vacantes) y quiénes la ruta de oficio técnico (~127 alumnos).</div></div></div>
+          </div>
+        </div>
+        <div>
+          <div class="section-label">Ventajas</div>
+          <h2 class="section-title">¿Por qué esta I.E.?</h2>
+          <div class="gold-divider"></div>
+          <div class="admision-cards">
+            <div class="admision-card"><div class="admision-card-icon">🌍</div><div class="admision-card-title">IELTS C1 garantizado</div><div class="admision-card-text">Todos los egresados, sin excepción, reciben certificación IELTS nivel C1 de inglés al finalizar el año 15.</div></div>
+            <div class="admision-card"><div class="admision-card-icon">🏆</div><div class="admision-card-title">BI integrado</div><div class="admision-card-text">Uno de los pocos colegios peruanos con Bachillerato Internacional integrado. Diploma reconocido mundialmente.</div></div>
+            <div class="admision-card"><div class="admision-card-icon">⚡</div><div class="admision-card-title">2 años de ventaja</div><div class="admision-card-text">Egresados con título técnico a los 18 o bachiller universitario a los 19. Versus los 20-21 años del sistema tradicional.</div></div>
+            <div class="admision-card"><div class="admision-card-icon">📈</div><div class="admision-card-title">Solo meritocracia</div><div class="admision-card-text">El acceso al BI depende exclusivamente del puntaje acumulado. No hay favoritismos ni cupos especiales.</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="section-label">Requisitos</div>
+      <h2 class="section-title" style="margin-bottom:1.5rem;">Documentación por nivel</h2>
+      <div class="req-grid">
+        <div class="req-card"><h4>Inicial</h4><ul><li>Partida de nacimiento</li><li>DNI del menor (si aplica)</li><li>DNI de los padres/tutores</li><li>Ficha de matrícula completa</li><li>Evaluación psicopedagógica</li></ul></div>
+        <div class="req-card"><h4>Primaria</h4><ul><li>Libreta de notas del año anterior</li><li>DNI del estudiante</li><li>DNI de los padres/tutores</li><li>Evaluación de ingreso I.E.</li><li>Carta de compromiso familiar</li></ul></div>
+        <div class="req-card"><h4>Secundaria</h4><ul><li>Certificado de primaria completa</li><li>Ranking o notas de primaria</li><li>DNI del estudiante</li><li>Evaluación de equivalencia (externos)</li><li>Carta de compromiso con el reglamento</li></ul></div>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div><div class="footer-brand">I.E. Privada</div><p class="footer-lema">Mérito · Disciplina · Futuro</p><p class="footer-about">Lima, Perú.</p></div>
+        <div class="footer-col"><h4>Admisión</h4><ul><li><a onclick="goTo('admision')">Inicial</a></li><li><a onclick="goTo('admision')">Primaria</a></li><li><a onclick="goTo('admision')">Secundaria</a></li></ul></div>
+        <div class="footer-col"><h4>Institución</h4><ul><li><a onclick="goTo('inicio')">Inicio</a></li><li><a onclick="goTo('sistema')">Sistema</a></li><li><a onclick="goTo('trayectoria')">Trayectorias</a></li></ul></div>
+      </div>
+      <div class="footer-bottom"><p>© I.E. Privada · Lima, Perú</p><div class="footer-badge">Portal Privado</div></div>
+    </div>
+  </footer>
+</div>
+
+<!-- ═══ TRAYECTORIAS ═══ -->
+<div class="page" id="page-trayectoria">
+  <div class="tray-hero">
+    <div class="container">
+      <div class="section-label" style="color:var(--gold)">Proyección de vida</div>
+      <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(36px,5vw,60px);color:white;font-weight:600;margin-bottom:1rem;">Trayectorias</h1>
+      <p style="color:rgba(255,255,255,.6);font-size:16px;font-weight:300;max-width:560px;">Cómo cambia la trayectoria de vida de un egresado de esta institución frente al sistema educativo tradicional peruano.</p>
+    </div>
+  </div>
+  <div class="tray-body">
+    <div class="container">
+      <div class="tray-grid">
+        <div class="tray-card">
+          <div class="tray-icon">🎓</div>
+          <div class="tray-title">Ruta Bachillerato Internacional</div>
+          <div class="tray-text">
+            <strong style="color:var(--gold-light);">Con el sistema:</strong> Secundaria + BI a los 11-15 → Universidad 3 a 3.5 años (6-7 ciclos) → Bachiller universitario + IELTS C1 + diploma IB a los ~19 años.<br><br>
+            <strong style="color:rgba(255,255,255,.4);">Sistema tradicional:</strong> Secundaria a los 12-16 → Universidad 4 años (8 ciclos) → Bachiller a los ~21 años. Sin inglés certificado.<br><br>
+            <strong style="color:var(--gold-light);">Ventaja: ~2 años de adelanto.</strong> El diploma IB convalida 36-48 créditos universitarios (2 ciclos completos).
+          </div>
+        </div>
+        <div class="tray-card">
+          <div class="tray-icon">🔧</div>
+          <div class="tray-title">Ruta Oficio Técnico</div>
+          <div class="tray-text">
+            <strong style="color:var(--gold-light);">Con el sistema:</strong> Secundaria + oficio a los 11-15 → Instituto 2 años con convalidación (16-17) → Título técnico profesional + IELTS C1 a los ~18 años.<br><br>
+            <strong style="color:rgba(255,255,255,.4);">Sistema tradicional:</strong> Secundaria a los 12-16 → Instituto 3 años (17-19) → Título técnico a los ~20 años. Sin inglés certificado.<br><br>
+            <strong style="color:var(--gold-light);">Ventaja: 2 años de adelanto.</strong> El certificado de oficio convalida cursos reduciendo la carrera técnica de 3 a 2 años.
+          </div>
+        </div>
+      </div>
+
+      <div class="ventaja-bar">
+        <div class="ventaja-title">El diferencial del sistema</div>
+        <div class="ventaja-items">
+          <div class="ventaja-item"><div class="ventaja-n">~18</div><div class="ventaja-l">Años con título técnico (ruta oficio)</div></div>
+          <div class="ventaja-item"><div class="ventaja-n">~19</div><div class="ventaja-l">Años con grado universitario (ruta BI)</div></div>
+          <div class="ventaja-item"><div class="ventaja-n">C1</div><div class="ventaja-l">Nivel de inglés IELTS certificado para todos</div></div>
+          <div class="ventaja-item"><div class="ventaja-n">2 años</div><div class="ventaja-l">De ventaja laboral frente al sistema tradicional</div></div>
+        </div>
+      </div>
+
+      <div style="margin-top:2.5rem;">
+        <div class="section-label" style="color:var(--gold)">Salidas al egresar</div>
+        <h2 style="font-family:'Cormorant Garamond',serif;font-size:36px;color:white;font-weight:600;margin-bottom:1.5rem;">Tres niveles de beneficios</h2>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+          <div style="background:rgba(255,255,255,.07);border:1px solid rgba(201,168,76,.3);border-radius:14px;padding:1.5rem;">
+            <div style="font-size:13px;font-weight:600;color:var(--gold-light);margin-bottom:.75rem;letter-spacing:.5px;">BI CON RANKING DESTACADO</div>
+            <div style="font-size:13px;color:rgba(255,255,255,.65);line-height:1.8;font-weight:300;">Diploma IB internacional · Becas institucionales · Viajes · Cartas de recomendación · Reconocimientos · Máximas oportunidades Pronabec · Acceso universitario nacional e internacional · Beneficios de entidades asociadas</div>
+          </div>
+          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:1.5rem;">
+            <div style="font-size:13px;font-weight:600;color:rgba(255,255,255,.8);margin-bottom:.75rem;letter-spacing:.5px;">BI SIN RANKING DESTACADO</div>
+            <div style="font-size:13px;color:rgba(255,255,255,.5);line-height:1.8;font-weight:300;">Diploma IB internacional · Más oportunidades Pronabec que egresados sin BI · Acceso universitario nacional e internacional · Ventaja competitiva laboral · IELTS C1 certificado</div>
+          </div>
+          <div style="background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.2);border-radius:14px;padding:1.5rem;">
+            <div style="font-size:13px;font-weight:600;color:var(--gold);margin-bottom:.75rem;letter-spacing:.5px;">OFICIO / SECUNDARIA REGULAR</div>
+            <div style="font-size:13px;color:rgba(255,255,255,.5);line-height:1.8;font-weight:300;">Certificado institucional de oficio · IELTS C1 · Ranking 5 años por sección · 1ro, 2do y 3er puesto · Tercio y quinto superior · Pronabec · Inserción laboral inmediata</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div><div class="footer-brand">I.E. Privada</div><p class="footer-lema">Mérito · Disciplina · Futuro</p><p class="footer-about">Lima, Perú · Proyecto en desarrollo.</p></div>
+        <div class="footer-col"><h4>Trayectorias</h4><ul><li><a onclick="goTo('trayectoria')">Ruta BI</a></li><li><a onclick="goTo('trayectoria')">Ruta Oficio</a></li><li><a onclick="goTo('trayectoria')">Salidas</a></li></ul></div>
+        <div class="footer-col"><h4>Institución</h4><ul><li><a onclick="goTo('inicio')">Inicio</a></li><li><a onclick="goTo('sistema')">Sistema</a></li><li><a onclick="goTo('admision')">Admisión</a></li></ul></div>
+      </div>
+      <div class="footer-bottom"><p>© I.E. Privada · Lima, Perú</p><div class="footer-badge">Portal Privado</div></div>
+    </div>
+  </footer>
+</div>
+
+</div><!-- /site -->
+
+<script>
+function doLogin(){
+  const u=document.getElementById('lu').value.trim();
+  const p=document.getElementById('lp').value.trim();
+  if(u==='admin'&&p==='1234'){
+    document.getElementById('login-overlay').style.display='none';
+    document.getElementById('site').style.display='block';
+    goTo('inicio');
+  } else {
+    document.getElementById('lerr').style.display='block';
+  }
+}
+document.getElementById('lp').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+
+function goTo(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const el=document.getElementById('page-'+page);
+  if(el) el.classList.add('active');
+  document.querySelectorAll('.nav-link[data-page]').forEach(l=>{
+    l.classList.toggle('active',l.dataset.page===page);
+  });
+  window.scrollTo(0,0);
+}
+
+function showSis(tab,btn){
+  document.querySelectorAll('.sis-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sis-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('sp-'+tab).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
